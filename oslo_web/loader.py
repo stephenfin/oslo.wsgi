@@ -15,8 +15,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from __future__ import annotations
+
 import os
 
+from oslo_config import cfg
 from oslo_log import log as logging
 from paste import deploy
 
@@ -29,32 +32,35 @@ LOG = logging.getLogger(__name__)
 class Loader:
     """Used to load WSGI applications from paste configurations."""
 
-    def __init__(self, conf):
+    config_path: str
+
+    def __init__(self, conf: cfg.ConfigOpts) -> None:
         """Initialize the loader, and attempt to find the config.
 
         :param conf: Application config
         :returns: None
-
         """
         conf.register_opts(options.opts)
-        self.config_path = None
 
         config_path = conf.api_paste_config
         if not os.path.isabs(config_path):
-            self.config_path = conf.find_file(config_path)
+            config_path = conf.find_file(config_path)
         elif os.path.exists(config_path):
-            self.config_path = config_path
+            config_path = config_path
+        else:
+            config_path = None
 
-        if not self.config_path:
+        if not config_path:
             raise exceptions.ConfigNotFound(path=config_path)
 
-    def load_app(self, name):
+        self.config_path = config_path
+
+    def load_app(self, name: str) -> deploy.APP:
         """Return the paste URLMap wrapped WSGI application.
 
         :param name: Name of the application to load.
         :returns: Paste URLMap object wrapping the requested application.
         :raises: PasteAppNotFound
-
         """
         try:
             LOG.debug(

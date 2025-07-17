@@ -15,14 +15,23 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from __future__ import annotations
+
+from typing import Any, TYPE_CHECKING
+
 import routes.middleware
 import webob
+import webob.dec
+import webob.exc
+
+if TYPE_CHECKING:
+    import routes.mapper
 
 
 class Router:
     """WSGI middleware that maps incoming requests to WSGI apps."""
 
-    def __init__(self, mapper):
+    def __init__(self, mapper: routes.mapper.Mapper) -> None:
         """Create a router for the given routes.Mapper.
 
         Each route in `mapper` must specify a 'controller', which is a
@@ -49,23 +58,27 @@ class Router:
             self._dispatch, self.map
         )
 
-    @webob.dec.wsgify(RequestClass=webob.Request)
-    def __call__(self, req):
+    @webob.dec.wsgify(RequestClass=webob.Request)  # type: ignore[untyped-decorator]
+    def __call__(
+        self, req: webob.Request
+    ) -> routes.middleware.RoutesMiddleware:
         """Route the incoming request to a controller based on self.map.
 
         If no match, return a 404.
         """
         return self._router
 
+    # TODO(stephenfin): This returns a callable or exception, but how do we
+    # type that sanely?
     @staticmethod
-    @webob.dec.wsgify(RequestClass=webob.Request)
-    def _dispatch(req):
+    @webob.dec.wsgify(RequestClass=webob.Request)  # type: ignore[untyped-decorator]
+    def _dispatch(req: webob.Request) -> Any:
         """Dispatch the request to the appropriate controller.
 
-        Called by self._router after matching the incoming request to a route
-        and putting the information into req.environ.  Either returns 404
-        or the routed WSGI app's response.
+        Called by ``self._router`` after matching the incoming request to a
+        route and putting the information into ``req.environ``.
 
+        Either returns 404 or the routed WSGI app's response.
         """
         match = req.environ['wsgiorg.routing_args'][1]
         if not match:

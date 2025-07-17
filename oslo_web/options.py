@@ -16,7 +16,7 @@ import copy
 
 from oslo_config import cfg
 
-opts = [
+opts: list[cfg.Opt] = [
     cfg.StrOpt(
         'api_paste_config',
         default='api-paste.ini',
@@ -25,11 +25,11 @@ opts = [
 ]
 
 
-def list_opts():
+def list_opts() -> list[tuple[str | None, list[cfg.Opt]]]:
     """Entry point for oslo-config-generator."""
     return [(None, copy.deepcopy(opts))]
 
 
-def register_opts(conf):
+def register_opts(conf: cfg.ConfigOpts) -> None:
     """Registers WSGI config options."""
-    return conf.register_opts(opts)
+    conf.register_opts(opts)

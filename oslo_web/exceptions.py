@@ -19,13 +19,13 @@ from oslo_web._i18n import _
 
 
 class ConfigNotFound(Exception):
-    def __init__(self, path):
+    def __init__(self, path: str) -> None:
         msg = _('Could not find config at %(path)s') % {'path': path}
         super().__init__(msg)
 
 
 class PasteAppNotFound(Exception):
-    def __init__(self, name, path):
+    def __init__(self, name: str, path: str) -> None:
         msg = _("Could not load paste app '%(name)s' from %(path)s") % {
             'name': name,
             'path': path,
