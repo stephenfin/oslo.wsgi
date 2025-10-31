@@ -15,8 +15,10 @@
 import fixtures
 from oslo_config import fixture as config
 from oslotest import base as test_base
+from oslotest import output
 
 from oslo_web import options
+from oslo_web.tests import fixtures as wsgi_fixtures
 
 
 class BaseTestCase(test_base.BaseTestCase):
@@ -28,6 +30,10 @@ class BaseTestCase(test_base.BaseTestCase):
         self.conf = self.conf_fixture.conf
         self.config = self.conf_fixture.config
         self.conf(args=[], default_config_files=[])
+
+        self.capture_fixture = self.useFixture(output.CaptureOutput())
+        self.logging_fixture = self.useFixture(fixtures.LoggerFixture())
+        self.warning_fixture = self.useFixture(wsgi_fixtures.WarningsFixture())
 
     def get_new_temp_dir(self):
         """Create a new temporary directory.
