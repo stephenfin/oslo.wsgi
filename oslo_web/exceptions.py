@@ -31,3 +31,7 @@ class PasteAppNotFound(Exception):
             'path': path,
         }
         super().__init__(msg)
+
+
+class ValidationError(Exception):
+    """Base class for validation failures."""

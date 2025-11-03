@@ -40,7 +40,7 @@ class Loader:
         :param conf: Application config
         :returns: None
         """
-        conf.register_opts(options.opts)
+        conf.register_opts(options.paste_opts)
 
         config_path = conf.api_paste_config
         if not os.path.isabs(config_path):
